@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.0...v1.0.1) (2026-05-28)
+
+
+### Bug Fixes
+
+* ensure .env and build artifacts in gitignore ([d4df8f5](https://github.com/lhw/opencode-tool-kagi/commit/d4df8f563f6953bcf9c4d1fe46d98f4c6600f01c))
+* ensure node_modules in gitignore ([1105faa](https://github.com/lhw/opencode-tool-kagi/commit/1105faa5818cbf102f8687ee60171737471eb3d4))
+
 ## 1.0.0 (2026-05-28)
 
 
