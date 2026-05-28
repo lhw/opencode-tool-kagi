@@ -16,6 +16,14 @@
     "test:integration": "node --env-file .env.node --import tsx --test tests/*.integration.test.ts",
     "typecheck": "tsc --noEmit"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lhw/opencode-tool-kagi.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@clack/prompts": "^1.4.0",
     "@opencode-ai/plugin": "^1.15.0"
