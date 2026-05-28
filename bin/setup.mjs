@@ -71,13 +71,13 @@ const apiKey = await text({
 })
 if (isCancel(apiKey)) cancel("Setup cancelled")
 
+const files = mode === "kagi" ? KAGI_ONLY : ALL
 const s = spinner()
 s.start("Installing...")
 
 try {
   await mkdir(targetDir, { recursive: true })
 
-  const files = mode === "kagi" ? KAGI_ONLY : ALL
   for (const f of files) {
     await copyFile(join(REPO_TOOLS, f), join(targetDir, f))
   }
