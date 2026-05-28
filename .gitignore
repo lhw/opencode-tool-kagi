@@ -1,6 +1,1 @@
 node_modules/
-dist/
-.turbo/
-*.tsbuildinfo
-.env.node
-.env
