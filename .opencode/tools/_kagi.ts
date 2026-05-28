@@ -81,8 +81,12 @@ async function requestKagi<T>(
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
     })
   } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      return { ok: false, error: "**Error:** Kagi API request timed out after 30 seconds" }
+    }
     return { ok: false, error: `**Network error:** ${err instanceof Error ? err.message : err}` }
   }
 
