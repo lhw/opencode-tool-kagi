@@ -8,7 +8,7 @@
     ".opencode/tools/"
   ],
   "bin": {
-    "kagi-tools": "./bin/setup.mjs"
+    "kagi-tools": "bin/setup.mjs"
   },
   "scripts": {
     "setup": "node ./bin/setup.mjs",
