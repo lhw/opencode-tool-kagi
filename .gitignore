@@ -4,3 +4,4 @@ dist/
 *.tsbuildinfo
 .env.node
 .env
+*.tgz
