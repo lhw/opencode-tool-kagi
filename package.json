@@ -1,0 +1,28 @@
+{
+  "name": "opencode-tool-kagi",
+  "version": "1.0.0",
+  "description": "OpenCode custom tools powered by the Kagi API — replaces built-in websearch with Kagi's premium search",
+  "type": "module",
+  "files": [
+    "bin/",
+    ".opencode/tools/"
+  ],
+  "bin": {
+    "kagi-tools": "./bin/setup.mjs"
+  },
+  "scripts": {
+    "setup": "node ./bin/setup.mjs",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:integration": "node --env-file .env.node --import tsx --test tests/*.integration.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.4.0",
+    "@opencode-ai/plugin": "^1.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
+    "typescript": "^5.0.0"
+  }
+}
