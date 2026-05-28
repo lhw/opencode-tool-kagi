@@ -62,9 +62,10 @@ export type SearchParams = {
   safe_search?: boolean
 }
 
-export async function searchKagi(
-  params: SearchParams,
-): Promise<{ ok: true; data: KagiSearchResponse } | { ok: false; error: string }> {
+async function requestKagi<T>(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const key = apiKey()
   if (!key) {
     return {
@@ -74,14 +75,9 @@ export async function searchKagi(
     }
   }
 
-  const body: Record<string, unknown> = { query: params.query, limit: params.limit ?? 10 }
-  if (params.workflow) body.workflow = params.workflow
-  if (params.lens_id) body.lens_id = params.lens_id
-  if (params.safe_search !== undefined) body.safe_search = params.safe_search
-
   let res: Response
   try {
-    res = await fetch(`${API_BASE}/search`, {
+    res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -96,18 +92,28 @@ export async function searchKagi(
     return {
       ok: false,
       error:
-        `**Search failed (HTTP ${res.status})**` +
+        `**Request failed (HTTP ${res.status})**` +
         (trace ? `\nTrace: \`${trace}\`` : "") +
         `\n\`\`\`\n${text.slice(0, 2000)}\n\`\`\``,
     }
   }
 
   try {
-    const parsed = (await res.json()) as KagiSearchResponse
+    const parsed = (await res.json()) as T
     return { ok: true, data: parsed }
   } catch {
     return { ok: false, error: "**Error:** Invalid JSON response from Kagi API" }
   }
+}
+
+export async function searchKagi(
+  params: SearchParams,
+): Promise<{ ok: true; data: KagiSearchResponse } | { ok: false; error: string }> {
+  const body: Record<string, unknown> = { query: params.query, limit: params.limit ?? 10 }
+  if (params.workflow) body.workflow = params.workflow
+  if (params.lens_id) body.lens_id = params.lens_id
+  if (params.safe_search !== undefined) body.safe_search = params.safe_search
+  return requestKagi<KagiSearchResponse>("/search", body)
 }
 
 export function formatSearchResults(resp: KagiSearchResponse, query: string): string {
@@ -192,44 +198,7 @@ export interface ExtractResult {
 export async function extractPages(
   urls: string[],
 ): Promise<{ ok: true; data: ExtractResult } | { ok: false; error: string }> {
-  const key = apiKey()
-  if (!key) {
-    return {
-      ok: false,
-      error:
-        "**KAGI_API_KEY not set.** Set the `KAGI_API_KEY` environment variable with your key from https://kagi.com/api/keys",
-    }
-  }
-
-  let res: Response
-  try {
-    res = await fetch(`${API_BASE}/extract`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ pages: urls.map((u) => ({ url: u })) }),
-    })
-  } catch (err) {
-    return { ok: false, error: `**Network error:** ${err instanceof Error ? err.message : err}` }
-  }
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "unknown error")
-    const trace = res.headers.get("x-kagi-trace") ?? ""
-    return {
-      ok: false,
-      error:
-        `**Request failed (HTTP ${res.status})**` +
-        (trace ? `\nTrace: \`${trace}\`` : "") +
-        `\n\`\`\`\n${text.slice(0, 2000)}\n\`\`\``,
-    }
-  }
-
-  try {
-    const parsed = (await res.json()) as ExtractResult
-    return { ok: true, data: parsed }
-  } catch {
-    return { ok: false, error: "**Error:** Invalid JSON response from Kagi API" }
-  }
+  return requestKagi<ExtractResult>("/extract", { pages: urls.map((u) => ({ url: u })) })
 }
 
 export function formatExtract(pages: ExtractPage[], maxChars?: number): string {

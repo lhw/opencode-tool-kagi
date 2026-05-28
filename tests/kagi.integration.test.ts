@@ -75,7 +75,7 @@ describe("extractPages (integration)", { skip: !hasKey }, () => {
     assert.ok(result.data.data)
     assert.equal(result.data.data.length, 1)
     const page = result.data.data[0]
-    assert.equal(page.error, null ?? undefined) // no error on success
+    assert.equal(page.error, null)
     assert.ok(page.markdown)
     assert.ok(page.markdown!.length > 100)
     assert.match(page.markdown!, /Hello/i)
