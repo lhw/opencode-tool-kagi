@@ -1,5 +1,10 @@
-import { tool } from "@opencode-ai/plugin/tool"
+import { z } from "zod"
 import { searchKagi, formatSearchResults, extractPages, formatExtract } from "./_kagi"
+
+const tool = Object.assign(
+  (input: Record<string, unknown>) => input,
+  { schema: z },
+)
 
 export function searchTool(description: string) {
   return tool({
