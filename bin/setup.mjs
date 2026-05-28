@@ -9,8 +9,8 @@ import { fileURLToPath } from "node:url"
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_TOOLS = join(__dirname, "..", ".opencode", "tools")
 
-const ALL = ["_factories.ts", "_kagi.ts", "kagi_search.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
-const KAGI_ONLY = ["_factories.ts", "_kagi.ts", "kagi_search.ts", "kagi_extract.ts"]
+const ALL = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
+const KAGI_ONLY = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts"]
 const PROJECT_DIR = join(process.cwd(), ".opencode", "tools")
 const GLOBAL_DIR = join(process.env.HOME ?? process.env.USERPROFILE, ".config", "opencode", "tools")
 
