@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.2](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.1...v1.0.2) (2026-05-28)
+
+
+### Bug Fixes
+
+* define tool() locally to avoid tsx+Node26 exports resolution bug ([50224a0](https://github.com/lhw/opencode-tool-kagi/commit/50224a083a18282658afbb18d54859031dfeab7b))
+* remove registry-url from publish workflow for OIDC compat ([6bde96e](https://github.com/lhw/opencode-tool-kagi/commit/6bde96e642e93131bd29282b47750e3857eac81b))
+* restore registry-url and add --provenance for OIDC ([5e9b2a6](https://github.com/lhw/opencode-tool-kagi/commit/5e9b2a6dc4349a0b9c8c90a32f6203a1561bb832))
+* switch publish workflow to npm trusted publishing (OIDC) ([df8b259](https://github.com/lhw/opencode-tool-kagi/commit/df8b25953420b4e0e5aabb37212b35cddfa48ab6))
+* use PAT for release-please to trigger publish workflow ([9d9cb8f](https://github.com/lhw/opencode-tool-kagi/commit/9d9cb8f056e1dccb06449981fb8fd73487709e18))
+
 ## [1.0.1](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.0...v1.0.1) (2026-05-28)
 
 
