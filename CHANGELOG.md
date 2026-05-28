@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.3...v1.0.4) (2026-05-28)
+
+
+### Bug Fixes
+
+* hoist files variable out of try block in setup ([04e9968](https://github.com/lhw/opencode-tool-kagi/commit/04e9968c977491a9e6f936d07b9024b671d0a0f3))
+
 ## [1.0.3](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.2...v1.0.3) (2026-05-28)
 
 
