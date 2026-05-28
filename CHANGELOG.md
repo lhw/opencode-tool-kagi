@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.4...v1.0.5) (2026-05-28)
+
+
+### Bug Fixes
+
+* add 30s timeout to Kagi API requests ([4835502](https://github.com/lhw/opencode-tool-kagi/commit/48355020b27c79bc32b101d24fb4e1597896f060))
+
 ## [1.0.4](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.3...v1.0.4) (2026-05-28)
 
 
