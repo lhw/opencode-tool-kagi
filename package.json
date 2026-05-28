@@ -1,6 +1,6 @@
 {
   "name": "opencode-tool-kagi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "OpenCode custom tools powered by the Kagi API — replaces built-in websearch with Kagi's premium search",
   "type": "module",
   "files": [

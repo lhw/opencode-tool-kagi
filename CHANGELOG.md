@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.2...v1.0.3) (2026-05-28)
+
+
+### Bug Fixes
+
+* add --uninstall flag and fix tsx+Node26 module resolution ([95a53e4](https://github.com/lhw/opencode-tool-kagi/commit/95a53e4422c1e65ef4047e0b3919fd4f55de1133))
+* make tool files self-contained with zod import, drop _factories dependency ([df94f64](https://github.com/lhw/opencode-tool-kagi/commit/df94f64536133305ae4cc8304063104610e541f0))
+
 ## [1.0.2](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.1...v1.0.2) (2026-05-28)
 
 
