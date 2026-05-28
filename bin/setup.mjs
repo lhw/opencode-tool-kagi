@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { intro, outro, select, text, isCancel, cancel, note, spinner } from "@clack/prompts"
-import { copyFile, mkdir, writeFile } from "node:fs/promises"
+import { intro, outro, select, text, isCancel, cancel, note, spinner, confirm } from "@clack/prompts"
+import { copyFile, mkdir, writeFile, rm } from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -9,8 +9,39 @@ import { fileURLToPath } from "node:url"
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_TOOLS = join(__dirname, "..", ".opencode", "tools")
 
-const ALL = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
-const KAGI_ONLY = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts"]
+const ALL = ["_factories.ts", "_kagi.ts", "kagi_search.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
+const KAGI_ONLY = ["_factories.ts", "_kagi.ts", "kagi_search.ts", "kagi_extract.ts"]
+const PROJECT_DIR = join(process.cwd(), ".opencode", "tools")
+const GLOBAL_DIR = join(process.env.HOME ?? process.env.USERPROFILE, ".config", "opencode", "tools")
+
+if (process.argv.includes("--uninstall")) {
+  intro("Uninstall Kagi Tools")
+  const s = spinner()
+  s.start("Removing...")
+  const removed = []
+  for (const dir of [PROJECT_DIR, GLOBAL_DIR]) {
+    for (const f of ALL) {
+      const fp = join(dir, f)
+      if (existsSync(fp)) {
+        await rm(fp)
+        removed.push(fp)
+      }
+    }
+    const keyFile = join(dir, "..", "kagi-api-key")
+    if (existsSync(keyFile)) {
+      await rm(keyFile)
+      removed.push(keyFile)
+    }
+  }
+  s.stop("Removed")
+  if (removed.length) {
+    note(removed.join("\n"), "Deleted files")
+    outro("Restart opencode — tools are gone.")
+  } else {
+    outro("No Kagi tools found to uninstall.")
+  }
+  process.exit(0)
+}
 
 intro("Kagi Tools for OpenCode")
 
@@ -23,9 +54,7 @@ const location = await select({
 })
 if (isCancel(location)) cancel("Setup cancelled")
 
-const targetDir = location === "global"
-  ? join(process.env.HOME ?? process.env.USERPROFILE, ".config", "opencode", "tools")
-  : join(process.cwd(), ".opencode", "tools")
+const targetDir = location === "global" ? GLOBAL_DIR : PROJECT_DIR
 
 const mode = await select({
   message: "Which tools do you want?",
@@ -65,7 +94,6 @@ try {
   cancel(`Error: ${e.message}`)
 }
 
-const files = mode === "kagi" ? KAGI_ONLY : ALL
 note(files.map((f) => join(targetDir, f)).join("\n"), "Installed files")
 
 const hasPlugin =
