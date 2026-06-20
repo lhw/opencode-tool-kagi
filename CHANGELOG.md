@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.5...v1.0.6) (2026-06-20)
+
+
+### Bug Fixes
+
+* remove tarball binary from branch ([740d0e6](https://github.com/lhw/opencode-tool-kagi/commit/740d0e696e2a3e5d8f577fda346c0ee9f6e88e3d))
+
 ## [1.0.5](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.4...v1.0.5) (2026-05-28)
 
 
