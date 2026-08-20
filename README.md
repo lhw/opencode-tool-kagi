@@ -12,7 +12,7 @@ OpenCode custom tools powered by the [Kagi API](https://kagi.com/api/docs/openap
 ## Setup
 
 ```bash
-npx kagi-tools
+npx opencode-tool-kagi
 ```
 
 Or locally:
