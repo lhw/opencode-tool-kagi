@@ -44,14 +44,17 @@ describe("searchKagi (integration)", { skip: !hasKey }, () => {
   })
 
   it("fails gracefully without API key", async () => {
-    const orig = process.env.KAGI_API_KEY
+    const origEnv = process.env.KAGI_API_KEY
+    const origHome = process.env.HOME
     delete process.env.KAGI_API_KEY
+    process.env.HOME = "/nonexistent-opencode-kagi-home"
     try {
       const result = await searchKagi({ query: "x" })
       assert.equal(result.ok, false)
       assert.match(result.ok === false ? result.error : "", /KAGI_API_KEY not set/)
     } finally {
-      process.env.KAGI_API_KEY = orig
+      process.env.KAGI_API_KEY = origEnv
+      process.env.HOME = origHome
     }
   })
 })
@@ -75,7 +78,7 @@ describe("extractPages (integration)", { skip: !hasKey }, () => {
     assert.ok(result.data.data)
     assert.equal(result.data.data.length, 1)
     const page = result.data.data[0]
-    assert.equal(page.error, null)
+    assert.ok(!page.error)
     assert.ok(page.markdown)
     assert.ok(page.markdown!.length > 100)
     assert.match(page.markdown!, /Hello/i)

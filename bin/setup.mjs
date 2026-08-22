@@ -9,8 +9,8 @@ import { fileURLToPath } from "node:url"
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_TOOLS = join(__dirname, "..", ".opencode", "tools")
 
-const ALL = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
-const KAGI_ONLY = ["_kagi.ts", "kagi_search.ts", "kagi_extract.ts"]
+const ALL = ["_kagi.ts", "kagi_extract.ts", "websearch.ts", "webfetch.ts"]
+const KAGI_ONLY = ["_kagi.ts", "kagi_extract.ts"]
 const PROJECT_DIR = join(process.cwd(), ".opencode", "tools")
 const GLOBAL_DIR = join(process.env.HOME ?? process.env.USERPROFILE, ".config", "opencode", "tools")
 
@@ -60,7 +60,7 @@ const mode = await select({
   message: "Which tools do you want?",
   options: [
     { value: "all", label: "All (recommended)", hint: "overrides built-in websearch and webfetch" },
-    { value: "kagi", label: "Kagi only", hint: "just kagi_search and kagi_extract" },
+    { value: "kagi", label: "Kagi only", hint: "just kagi_extract (no built-in overrides)" },
   ],
 })
 if (isCancel(mode)) cancel("Setup cancelled")

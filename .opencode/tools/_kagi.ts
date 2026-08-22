@@ -30,6 +30,15 @@ export function apiKey(): string {
   return ""
 }
 
+export function missingKeyError(): string {
+  const home = process.env.HOME ?? process.env.USERPROFILE ?? "~"
+  return (
+    "**KAGI_API_KEY not set.** Set the `KAGI_API_KEY` environment variable, or create a `kagi-api-key` file (mode 0600) in one of:\n" +
+    `- \`${join(home, ".config", "opencode", "kagi-api-key")}\` (global)\n` +
+    `- \`${join(process.cwd(), ".opencode", "kagi-api-key")}\` (project)`
+  )
+}
+
 export interface KagiResult {
   url: string
   title: string
@@ -68,11 +77,7 @@ async function requestKagi<T>(
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const key = apiKey()
   if (!key) {
-    return {
-      ok: false,
-      error:
-        "**KAGI_API_KEY not set.** Set the `KAGI_API_KEY` environment variable with your key from https://kagi.com/api/keys",
-    }
+    return { ok: false, error: missingKeyError() }
   }
 
   let res: Response
@@ -91,14 +96,31 @@ async function requestKagi<T>(
   }
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "unknown error")
+    const bodyText = await res.text().catch(() => "unknown error")
     const trace = res.headers.get("x-kagi-trace") ?? ""
+    const detail = `${trace ? `\nTrace: \`${trace}\`` : ""}\n\`\`\`\n${bodyText.slice(0, 2000)}\n\`\`\``
+
+    if (res.status === 401 || res.status === 403) {
+      return {
+        ok: false,
+        error:
+          `**Invalid or expired API key (HTTP ${res.status}).** Get a key at https://kagi.com/api/keys and set ` +
+          `\`KAGI_API_KEY\` or a \`kagi-api-key\` file.${detail}`,
+      }
+    }
+
+    if (res.status === 429) {
+      const retryAfter = res.headers.get("retry-after")
+      const wait = retryAfter ? ` Wait ${retryAfter}s and retry.` : " Try again later."
+      return {
+        ok: false,
+        error: `**Rate limited (HTTP 429).**${wait}${detail}`,
+      }
+    }
+
     return {
       ok: false,
-      error:
-        `**Request failed (HTTP ${res.status})**` +
-        (trace ? `\nTrace: \`${trace}\`` : "") +
-        `\n\`\`\`\n${text.slice(0, 2000)}\n\`\`\``,
+      error: `**Request failed (HTTP ${res.status})**${detail}`,
     }
   }
 
@@ -199,10 +221,18 @@ export interface ExtractResult {
   meta?: { trace?: string }
 }
 
+export type ExtractOptions = {
+  /** Time budget in seconds for the bulk extraction operation (clamped by Kagi). */
+  timeout?: number
+}
+
 export async function extractPages(
   urls: string[],
+  opts: ExtractOptions = {},
 ): Promise<{ ok: true; data: ExtractResult } | { ok: false; error: string }> {
-  return requestKagi<ExtractResult>("/extract", { pages: urls.map((u) => ({ url: u })) })
+  const body: Record<string, unknown> = { pages: urls.map((u) => ({ url: u })) }
+  if (opts.timeout !== undefined) body.timeout = opts.timeout
+  return requestKagi<ExtractResult>("/extract", body)
 }
 
 export function formatExtract(pages: ExtractPage[], maxChars?: number): string {

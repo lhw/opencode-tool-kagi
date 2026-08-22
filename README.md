@@ -7,7 +7,6 @@ OpenCode custom tools powered by the [Kagi API](https://kagi.com/api/docs/openap
 | `websearch` | ✅ `websearch` | Premium web search via Kagi |
 | `webfetch` | ✅ `webfetch` | Fetch and extract markdown from URLs |
 | `kagi_extract` | — | Explicit extract markdown content from URLs |
-| `kagi_search` | — | Explicit Kagi premium web search |
 
 ## Setup
 
@@ -24,7 +23,7 @@ npm run setup
 The interactive wizard guides you through:
 
 - **Install scope** — per-project (`.opencode/tools/`) or global (`~/.config/opencode/tools/`)
-- **Tools selection** — all tools with built-in overrides, or just `kagi_search`/`kagi_extract`
+- **Tools selection** — all tools with built-in overrides, or just `kagi_extract`
 - **API key** — optional; set it now or later via `KAGI_API_KEY` env var
 
 ### Requirements
@@ -32,6 +31,14 @@ The interactive wizard guides you through:
 - OpenCode (any version)
 - Node.js >= 18
 - A [Kagi API key](https://kagi.com/api/keys)
+
+### API key resolution
+
+The key is looked up in this order:
+
+1. `KAGI_API_KEY` environment variable
+2. `~/.config/opencode/kagi-api-key` (global, written by the installer)
+3. `.opencode/kagi-api-key` (per-project)
 
 ## Usage
 
@@ -41,7 +48,6 @@ Once installed, use the tools directly in opencode:
 > websearch "latest ai research papers 2026"
 > webfetch https://example.com/article
 > kagi_extract urls: ["https://example.com/article"]
-> kagi_search query:"rust programming" limit:20
 ```
 
 ## Tools
@@ -73,16 +79,5 @@ Explicit extract tool — clean markdown from URLs.
 | Arg | Type | Required | Description |
 |-----|------|----------|-------------|
 | `urls` | `string[]` | ✅ | 1–10 URLs to extract |
-| `max_chars` | `number` | — | Max characters per URL |
-
-### `kagi_search`
-
-Explicit search tool — Kagi premium search without overriding the built-in.
-
-| Arg | Type | Required | Description |
-|-----|------|----------|-------------|
-| `query` | `string` | ✅ | Search query |
-| `limit` | `number` | — | Max results (1–1024, default 10) |
-| `workflow` | `enum` | — | `search`, `images`, `videos`, `news`, `podcasts` |
-| `lens_id` | `string` | — | Kagi Lens for focused results |
-| `safe_search` | `boolean` | — | Filter NSFW content |
+| `timeout` | `number` | — | Time budget in seconds for the bulk extraction (clamped by Kagi) |
+| `max_chars` | `number` | — | Max characters per URL (truncated locally) |
