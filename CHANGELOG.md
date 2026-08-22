@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.6...v1.1.0) (2026-08-22)
+
+
+### Features
+
+* drop redundant kagi_search tool, fix naming, improve key and error handling ([5219add](https://github.com/lhw/opencode-tool-kagi/commit/5219add6a42e9240f8eaeee3430b2e58b26d9202))
+
 ## [1.0.6](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.5...v1.0.6) (2026-08-20)
 
 
