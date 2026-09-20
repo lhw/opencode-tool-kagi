@@ -43,7 +43,12 @@ if (process.argv.includes("--uninstall")) {
   process.exit(0)
 }
 
-intro("Kagi Tools for OpenCode")
+intro("Kagi Tools for OpenCode (v1)")
+
+note(
+  "OpenCode v2 uses plugins instead of copied tool files.\nIf you are on v2, cancel this wizard and run:\n  opencode plugin add opencode-tool-kagi",
+  "Using OpenCode v2?",
+)
 
 const location = await select({
   message: "Where do you want to install?",

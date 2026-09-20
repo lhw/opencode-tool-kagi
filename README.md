@@ -1,14 +1,58 @@
 # opencode-tool-kagi
 
-OpenCode custom tools powered by the [Kagi API](https://kagi.com/api/docs/openapi) — replaces built-in `websearch`/`webfetch` with Kagi's premium search and extraction.
+OpenCode plugin powered by the [Kagi API](https://kagi.com/api/docs/openapi) — replaces the built-in `websearch`/`webfetch` with Kagi's premium search and extraction.
+
+> **OpenCode v2 required.** This release ships an OpenCode v2 plugin that registers
+> Kagi as a websearch provider and stores the API key in OpenCode's credential
+> store. The `.opencode/tools/` copy install from the 1.x line is deprecated and
+> will be removed in a future release.
 
 | Tool | Replaces built-in | Description |
 |------|-------------------|-------------|
-| `websearch` | ✅ `websearch` | Premium web search via Kagi |
-| `webfetch` | ✅ `webfetch` | Fetch and extract markdown from URLs |
-| `kagi_extract` | — | Explicit extract markdown content from URLs |
+| `websearch` | ✅ `websearch` | Premium web search via Kagi (registered as the default websearch provider) |
+| `webfetch` | ✅ `webfetch` | Fetch and extract markdown from a URL |
+| `kagi_extract` | — | Explicit extract markdown content from 1–10 URLs |
 
 ## Setup
+
+### OpenCode v2 (recommended)
+
+Install the plugin through OpenCode:
+
+```bash
+opencode plugin add opencode-tool-kagi
+```
+
+Or add it to `opencode.jsonc` yourself:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["opencode-tool-kagi"],
+}
+```
+
+Then connect your Kagi account from the TUI — the key is stored in opencode's credential store, not in a plaintext file:
+
+```
+/connect
+# Select Kagi, then paste your API key.
+```
+
+Plugin options can disable individual pieces:
+
+```jsonc
+{
+  "plugins": [
+    {
+      "package": "opencode-tool-kagi",
+      "options": { "websearch": true, "webfetch": true, "extract": true },
+    },
+  ],
+}
+```
+
+### OpenCode v1 (legacy)
 
 ```bash
 npx opencode-tool-kagi
@@ -28,17 +72,20 @@ The interactive wizard guides you through:
 
 ### Requirements
 
-- OpenCode (any version)
-- Node.js >= 18
+- OpenCode v2 (plugin) or v1 (copied tools)
+- Node.js >= 18 for the v1 wizard
 - A [Kagi API key](https://kagi.com/api/keys)
 
 ### API key resolution
 
 The key is looked up in this order:
 
-1. `KAGI_API_KEY` environment variable
-2. `~/.config/opencode/kagi-api-key` (global, written by the installer)
-3. `.opencode/kagi-api-key` (per-project)
+1. The Kagi credential stored by opencode (`/connect`, or `KAGI_API_KEY` exposed as an integration connection)
+2. `KAGI_API_KEY` environment variable
+3. `~/.config/opencode/kagi-api-key` (global, written by the v1 installer)
+4. `.opencode/kagi-api-key` (per-project)
+
+On OpenCode v2 the plugin registers a `kagi` integration, so `/connect` manages the key through opencode's auth system. The file/env fallbacks remain for the v1 tools.
 
 ## Usage
 
@@ -54,23 +101,17 @@ Once installed, use the tools directly in opencode:
 
 ### `websearch`
 
-Overrides the built-in `websearch` with Kagi's premium search.
-
-| Arg | Type | Required | Description |
-|-----|------|----------|-------------|
-| `query` | `string` | ✅ | Search query |
-| `limit` | `number` | — | Max results (1–1024, default 10) |
-| `workflow` | `enum` | — | `search`, `images`, `videos`, `news`, `podcasts` |
-| `lens_id` | `string` | — | Kagi Lens for focused results |
-| `safe_search` | `boolean` | — | Filter NSFW content |
+Replaces the built-in `websearch` with Kagi's premium search by registering Kagi as the default websearch provider.
 
 ### `webfetch`
 
-Overrides the built-in `webfetch` with Kagi Extract.
+Replaces the built-in `webfetch` with Kagi Extract.
 
 | Arg | Type | Required | Description |
 |-----|------|----------|-------------|
 | `url` | `string` | ✅ | A single URL to fetch |
+| `format` | `enum` | — | Accepted for compatibility; Kagi always returns markdown |
+| `timeout` | `number` | — | Time budget in seconds for the extraction |
 
 ### `kagi_extract`
 
