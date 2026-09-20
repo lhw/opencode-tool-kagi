@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.0](https://github.com/lhw/opencode-tool-kagi/compare/v1.1.0...v2.0.0) (2026-09-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* OpenCode v2 is now required for the plugin entry point and the recommended install is `opencode plugin add opencode-tool-kagi` with the key connected via `/connect`. The `.opencode/tools/` copy install and the interactive wizard are deprecated and will be removed in a future release.
+
+### Features
+
+* add OpenCode v2 plugin support ([90152d9](https://github.com/lhw/opencode-tool-kagi/commit/90152d9da1b7bb40a69de3279edcf8a65c6ba382))
+* store Kagi key in opencode's credential store ([3f66d69](https://github.com/lhw/opencode-tool-kagi/commit/3f66d6963658f813ba3a2e63b896169a57b0151e))
+* target the OpenCode v2 plugin system ([48cbbfa](https://github.com/lhw/opencode-tool-kagi/commit/48cbbfa98d4f0730cb9a8916373ad4f4d942e5db))
+
+
+### Bug Fixes
+
+* pin patched toml to clear the high audit advisory ([d7fab11](https://github.com/lhw/opencode-tool-kagi/commit/d7fab11721949c80ef4f7dc58fa42252ff7eded3))
+
 ## [1.1.0](https://github.com/lhw/opencode-tool-kagi/compare/v1.0.6...v1.1.0) (2026-08-22)
 
 
