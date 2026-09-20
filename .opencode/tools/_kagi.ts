@@ -3,9 +3,8 @@ import { join } from "node:path"
 
 export const API_BASE = "https://kagi.com/api/v1"
 
-function keyFileFallbacks(): string[] {
+function keyFileFallbacks(cwd: string): string[] {
   const home = process.env.HOME ?? process.env.USERPROFILE ?? ""
-  const cwd = process.cwd()
   return [
     join(home, ".config", "opencode", "kagi-api-key"),
     join(cwd, ".opencode", "kagi-api-key"),
@@ -20,22 +19,22 @@ function readKeyFile(path: string): string {
   }
 }
 
-export function apiKey(): string {
+export function apiKey(cwd: string = process.cwd()): string {
   const env = process.env.KAGI_API_KEY
   if (env) return env
-  for (const p of keyFileFallbacks()) {
+  for (const p of keyFileFallbacks(cwd)) {
     const val = readKeyFile(p)
     if (val) return val
   }
   return ""
 }
 
-export function missingKeyError(): string {
+export function missingKeyError(cwd: string = process.cwd()): string {
   const home = process.env.HOME ?? process.env.USERPROFILE ?? "~"
   return (
     "**KAGI_API_KEY not set.** Set the `KAGI_API_KEY` environment variable, or create a `kagi-api-key` file (mode 0600) in one of:\n" +
     `- \`${join(home, ".config", "opencode", "kagi-api-key")}\` (global)\n` +
-    `- \`${join(process.cwd(), ".opencode", "kagi-api-key")}\` (project)`
+    `- \`${join(cwd, ".opencode", "kagi-api-key")}\` (project)`
   )
 }
 
@@ -69,15 +68,18 @@ export type SearchParams = {
   workflow?: string
   lens_id?: string
   safe_search?: boolean
+  /** Directory used to resolve a project-local `kagi-api-key`. */
+  cwd?: string
 }
 
 async function requestKagi<T>(
   path: string,
   body: Record<string, unknown>,
+  cwd: string = process.cwd(),
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
-  const key = apiKey()
+  const key = apiKey(cwd)
   if (!key) {
-    return { ok: false, error: missingKeyError() }
+    return { ok: false, error: missingKeyError(cwd) }
   }
 
   let res: Response
@@ -139,7 +141,7 @@ export async function searchKagi(
   if (params.workflow) body.workflow = params.workflow
   if (params.lens_id) body.lens_id = params.lens_id
   if (params.safe_search !== undefined) body.safe_search = params.safe_search
-  return requestKagi<KagiSearchResponse>("/search", body)
+  return requestKagi<KagiSearchResponse>("/search", body, params.cwd)
 }
 
 export function formatSearchResults(resp: KagiSearchResponse, query: string): string {
@@ -224,6 +226,8 @@ export interface ExtractResult {
 export type ExtractOptions = {
   /** Time budget in seconds for the bulk extraction operation (clamped by Kagi). */
   timeout?: number
+  /** Directory used to resolve a project-local `kagi-api-key`. */
+  cwd?: string
 }
 
 export async function extractPages(
@@ -232,7 +236,7 @@ export async function extractPages(
 ): Promise<{ ok: true; data: ExtractResult } | { ok: false; error: string }> {
   const body: Record<string, unknown> = { pages: urls.map((u) => ({ url: u })) }
   if (opts.timeout !== undefined) body.timeout = opts.timeout
-  return requestKagi<ExtractResult>("/extract", body)
+  return requestKagi<ExtractResult>("/extract", body, opts.cwd)
 }
 
 export function formatExtract(pages: ExtractPage[], maxChars?: number): string {

@@ -5,8 +5,12 @@
   "type": "module",
   "files": [
     "bin/",
+    "src/",
     ".opencode/tools/"
   ],
+  "exports": {
+    ".": "./src/plugin.ts"
+  },
   "bin": {
     "kagi-tools": "bin/setup.mjs"
   },
@@ -26,7 +30,8 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.4.0",
-    "@opencode-ai/plugin": "^1.15.0"
+    "@opencode-ai/plugin": "^1.15.0",
+    "@opencode/plugin": "^2.0.11"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
