@@ -65,13 +65,34 @@ export default Plugin.define({
     const cwd = ctx.location.directory
     const options = ctx.options as { websearch?: boolean; webfetch?: boolean; extract?: boolean }
 
+    await ctx.integration.transform((editor) => {
+      editor.update("kagi", (integration) => {
+        integration.name = "Kagi"
+      })
+      editor.method.update({
+        integrationID: "kagi",
+        method: { type: "key", label: "Kagi API key" },
+      })
+      editor.method.update({
+        integrationID: "kagi",
+        method: { type: "env", names: ["KAGI_API_KEY"] },
+      })
+    })
+
+    const resolveKey = async () => {
+      const connection = await ctx.integration.connection.active("kagi")
+      if (!connection) return undefined
+      const credential = await ctx.integration.connection.resolve(connection)
+      return credential?.type === "key" ? credential.key : undefined
+    }
+
     if (options.websearch !== false) {
       await ctx.websearch.transform((editor) => {
         editor.add({
           id: "kagi",
           name: "Kagi",
           async execute({ query }) {
-            const result = await searchKagi({ query, limit: 10, cwd })
+            const result = await searchKagi({ query, limit: 10, cwd, key: await resolveKey() })
             if (!result.ok) throw new Error(result.error)
             const d = result.data.data
             const results = d?.search?.length ? d.search : [...(d?.directAnswer ?? []), ...(d?.news ?? [])]
@@ -96,7 +117,7 @@ export default Plugin.define({
               timeout?: number
               max_chars?: number
             }
-            const result = await extractPages([url], { timeout, cwd })
+            const result = await extractPages([url], { timeout, cwd, key: await resolveKey() })
             if (!result.ok) return { content: result.error }
             const pages = result.data.data ?? []
             const trace = result.data.meta?.trace
@@ -121,7 +142,7 @@ export default Plugin.define({
               timeout?: number
               max_chars?: number
             }
-            const result = await extractPages(urls, { timeout, cwd })
+            const result = await extractPages(urls, { timeout, cwd, key: await resolveKey() })
             if (!result.ok) return { content: result.error }
             const pages = result.data.data ?? []
             const trace = result.data.meta?.trace

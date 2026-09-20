@@ -32,7 +32,7 @@ export function apiKey(cwd: string = process.cwd()): string {
 export function missingKeyError(cwd: string = process.cwd()): string {
   const home = process.env.HOME ?? process.env.USERPROFILE ?? "~"
   return (
-    "**KAGI_API_KEY not set.** Set the `KAGI_API_KEY` environment variable, or create a `kagi-api-key` file (mode 0600) in one of:\n" +
+    "**Kagi API key not set.** Connect Kagi with `/connect` in opencode, set the `KAGI_API_KEY` environment variable, or create a `kagi-api-key` file (mode 0600) in one of:\n" +
     `- \`${join(home, ".config", "opencode", "kagi-api-key")}\` (global)\n` +
     `- \`${join(cwd, ".opencode", "kagi-api-key")}\` (project)`
   )
@@ -68,18 +68,25 @@ export type SearchParams = {
   workflow?: string
   lens_id?: string
   safe_search?: boolean
+  /** Explicit API key, e.g. resolved from opencode's credential store. */
+  key?: string
   /** Directory used to resolve a project-local `kagi-api-key`. */
+  cwd?: string
+}
+
+type RequestOptions = {
+  key?: string
   cwd?: string
 }
 
 async function requestKagi<T>(
   path: string,
   body: Record<string, unknown>,
-  cwd: string = process.cwd(),
+  opts: RequestOptions = {},
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
-  const key = apiKey(cwd)
+  const key = opts.key || apiKey(opts.cwd)
   if (!key) {
-    return { ok: false, error: missingKeyError(cwd) }
+    return { ok: false, error: missingKeyError(opts.cwd) }
   }
 
   let res: Response
@@ -141,7 +148,7 @@ export async function searchKagi(
   if (params.workflow) body.workflow = params.workflow
   if (params.lens_id) body.lens_id = params.lens_id
   if (params.safe_search !== undefined) body.safe_search = params.safe_search
-  return requestKagi<KagiSearchResponse>("/search", body, params.cwd)
+  return requestKagi<KagiSearchResponse>("/search", body, { key: params.key, cwd: params.cwd })
 }
 
 export function formatSearchResults(resp: KagiSearchResponse, query: string): string {
@@ -226,6 +233,8 @@ export interface ExtractResult {
 export type ExtractOptions = {
   /** Time budget in seconds for the bulk extraction operation (clamped by Kagi). */
   timeout?: number
+  /** Explicit API key, e.g. resolved from opencode's credential store. */
+  key?: string
   /** Directory used to resolve a project-local `kagi-api-key`. */
   cwd?: string
 }
@@ -236,7 +245,7 @@ export async function extractPages(
 ): Promise<{ ok: true; data: ExtractResult } | { ok: false; error: string }> {
   const body: Record<string, unknown> = { pages: urls.map((u) => ({ url: u })) }
   if (opts.timeout !== undefined) body.timeout = opts.timeout
-  return requestKagi<ExtractResult>("/extract", body, opts.cwd)
+  return requestKagi<ExtractResult>("/extract", body, { key: opts.key, cwd: opts.cwd })
 }
 
 export function formatExtract(pages: ExtractPage[], maxChars?: number): string {

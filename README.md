@@ -27,6 +27,13 @@ Or add it to `opencode.jsonc` yourself:
 }
 ```
 
+Then connect your Kagi account from the TUI — the key is stored in opencode's credential store, not in a plaintext file:
+
+```
+/connect
+# Select Kagi, then paste your API key.
+```
+
 Plugin options can disable individual pieces:
 
 ```jsonc
@@ -68,9 +75,12 @@ The interactive wizard guides you through:
 
 The key is looked up in this order:
 
-1. `KAGI_API_KEY` environment variable
-2. `~/.config/opencode/kagi-api-key` (global, written by the installer)
-3. `.opencode/kagi-api-key` (per-project)
+1. The Kagi credential stored by opencode (`/connect`, or `KAGI_API_KEY` exposed as an integration connection)
+2. `KAGI_API_KEY` environment variable
+3. `~/.config/opencode/kagi-api-key` (global, written by the v1 installer)
+4. `.opencode/kagi-api-key` (per-project)
+
+On OpenCode v2 the plugin registers a `kagi` integration, so `/connect` manages the key through opencode's auth system. The file/env fallbacks remain for the v1 tools.
 
 ## Usage
 
