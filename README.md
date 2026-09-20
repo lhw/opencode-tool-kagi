@@ -2,6 +2,11 @@
 
 OpenCode plugin powered by the [Kagi API](https://kagi.com/api/docs/openapi) — replaces the built-in `websearch`/`webfetch` with Kagi's premium search and extraction.
 
+> **OpenCode v2 required.** This release ships an OpenCode v2 plugin that registers
+> Kagi as a websearch provider and stores the API key in OpenCode's credential
+> store. The `.opencode/tools/` copy install from the 1.x line is deprecated and
+> will be removed in a future release.
+
 | Tool | Replaces built-in | Description |
 |------|-------------------|-------------|
 | `websearch` | ✅ `websearch` | Premium web search via Kagi (registered as the default websearch provider) |
