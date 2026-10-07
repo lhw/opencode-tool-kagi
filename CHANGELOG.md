@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.0...v2.0.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* parse Kagi v1 snake_case response fields ([8cfc663](https://github.com/lhw/opencode-tool-kagi/commit/8cfc663bba7bf87b6f74009cc11997937d3d9d26))
+
 ## [2.0.0](https://github.com/lhw/opencode-tool-kagi/compare/v1.1.0...v2.0.0) (2026-09-20)
 
 
