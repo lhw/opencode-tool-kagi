@@ -31,7 +31,7 @@
   "dependencies": {
     "@clack/prompts": "^1.4.0",
     "@opencode-ai/plugin": "^1.15.0",
-    "@opencode/plugin": "^2.0.11"
+    "@opencode/plugin": "^2.0.24"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
