@@ -50,11 +50,11 @@ export interface KagiData {
   search?: KagiResult[]
   news?: KagiResult[]
   infobox?: KagiResult[]
-  directAnswer?: KagiResult[]
-  relatedSearch?: KagiResult[]
-  adjacentQuestion?: KagiResult[]
-  interestingFinds?: KagiResult[]
-  interestingNews?: KagiResult[]
+  direct_answer?: KagiResult[]
+  related_search?: KagiResult[]
+  adjacent_question?: KagiResult[]
+  interesting_finds?: KagiResult[]
+  interesting_news?: KagiResult[]
 }
 
 export interface KagiSearchResponse {
@@ -155,8 +155,8 @@ export function formatSearchResults(resp: KagiSearchResponse, query: string): st
   const d = resp.data
   const lines: string[] = [`# Web Search: ${query}\n`]
 
-  if (d?.directAnswer?.length) {
-    const a = d.directAnswer[0]
+  if (d?.direct_answer?.length) {
+    const a = d.direct_answer[0]
     lines.push("## Direct Answer")
     lines.push(a.snippet ?? a.title, "")
   }
@@ -188,26 +188,26 @@ export function formatSearchResults(resp: KagiSearchResponse, query: string): st
     lines.push("")
   }
 
-  if (d?.interestingFinds?.length) {
+  if (d?.interesting_finds?.length) {
     lines.push("## Interesting Finds")
-    for (const r of d.interestingFinds) {
+    for (const r of d.interesting_finds) {
       lines.push(`- [${r.title}](${r.url})` + (r.snippet ? ` — ${r.snippet}` : ""))
     }
     lines.push("")
   }
 
-  if (d?.adjacentQuestion?.length) {
+  if (d?.adjacent_question?.length) {
     lines.push("## Related Questions")
-    for (const r of d.adjacentQuestion) {
+    for (const r of d.adjacent_question) {
       const q = r.props?.question as string | undefined
       if (q) lines.push(`- ${q}`)
     }
     lines.push("")
   }
 
-  if (d?.relatedSearch?.length) {
+  if (d?.related_search?.length) {
     lines.push("## Related Searches")
-    for (const r of d.relatedSearch) {
+    for (const r of d.related_search) {
       lines.push(`- ${r.title}`)
     }
     lines.push("")

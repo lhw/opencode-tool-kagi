@@ -41,7 +41,7 @@ describe("formatSearchResults", () => {
   it("includes direct answer", () => {
     const resp: KagiSearchResponse = {
       data: {
-        directAnswer: [{ url: "https://x.com", title: "X", snippet: "42" }],
+        direct_answer: [{ url: "https://x.com", title: "X", snippet: "42" }],
       },
     }
     const out = formatSearchResults(resp, "answer")
@@ -79,7 +79,7 @@ describe("formatSearchResults", () => {
   it("includes interesting finds", () => {
     const resp: KagiSearchResponse = {
       data: {
-        interestingFinds: [{ url: "https://x.com", title: "Cool find", snippet: "neat" }],
+        interesting_finds: [{ url: "https://x.com", title: "Cool find", snippet: "neat" }],
       },
     }
     const out = formatSearchResults(resp, "find")
@@ -90,7 +90,7 @@ describe("formatSearchResults", () => {
   it("includes adjacent questions", () => {
     const resp: KagiSearchResponse = {
       data: {
-        adjacentQuestion: [
+        adjacent_question: [
           {
             url: "https://q.com",
             title: "Q",
@@ -107,7 +107,7 @@ describe("formatSearchResults", () => {
   it("includes related searches", () => {
     const resp: KagiSearchResponse = {
       data: {
-        relatedSearch: [{ url: "https://r.com", title: "related term" }],
+        related_search: [{ url: "https://r.com", title: "related term" }],
       },
     }
     const out = formatSearchResults(resp, "r")

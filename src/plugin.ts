@@ -95,7 +95,7 @@ export default Plugin.define({
             const result = await searchKagi({ query, limit: 10, cwd, key: await resolveKey() })
             if (!result.ok) throw new Error(result.error)
             const d = result.data.data
-            const results = d?.search?.length ? d.search : [...(d?.directAnswer ?? []), ...(d?.news ?? [])]
+            const results = d?.search?.length ? d.search : [...(d?.direct_answer ?? []), ...(d?.news ?? [])]
             return toWebResults(results)
           },
         })

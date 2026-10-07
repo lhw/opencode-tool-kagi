@@ -51,7 +51,7 @@ describe("searchKagi (integration)", { skip: !hasKey }, () => {
     try {
       const result = await searchKagi({ query: "x" })
       assert.equal(result.ok, false)
-      assert.match(result.ok === false ? result.error : "", /KAGI_API_KEY not set/)
+      assert.match(result.ok === false ? result.error : "", /Kagi API key not set/)
     } finally {
       process.env.KAGI_API_KEY = origEnv
       process.env.HOME = origHome
