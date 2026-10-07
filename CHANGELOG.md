@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.1...v2.0.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* bump @opencode/plugin to clear npm audit findings ([770a146](https://github.com/lhw/opencode-tool-kagi/commit/770a146cd43e4d1f8c99562806de47fdc46c4527))
+
 ## [2.0.1](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.0...v2.0.1) (2026-10-07)
 
 
