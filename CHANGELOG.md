@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.2...v3.0.0) (2026-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* OpenCode v2 is now required. The v1 copied-tool install and the `npx opencode-tool-kagi` / `npm run setup` wizard are removed. The shared library moved from .opencode/tools/_kagi.ts to src/kagi.ts, and the file-based API key fallbacks (~/.config/opencode/kagi-api-key, .opencode/kagi-api-key) are gone in favour of the opencode credential store or KAGI_API_KEY.
+
+### Features
+
+* require OpenCode v2, batch extract URLs, use JSON extract responses ([9817e5a](https://github.com/lhw/opencode-tool-kagi/commit/9817e5a23634fd7d9e23837d1de4344a029fd035))
+
 ## [2.0.2](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.1...v2.0.2) (2026-10-07)
 
 
