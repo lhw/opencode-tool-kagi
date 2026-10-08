@@ -2,20 +2,16 @@
 
 OpenCode plugin powered by the [Kagi API](https://kagi.com/api/docs/openapi) — replaces the built-in `websearch`/`webfetch` with Kagi's premium search and extraction.
 
-> **OpenCode v2 required.** This release ships an OpenCode v2 plugin that registers
-> Kagi as a websearch provider and stores the API key in OpenCode's credential
-> store. The `.opencode/tools/` copy install from the 1.x line is deprecated and
-> will be removed in a future release.
+> **OpenCode v2 required.** This plugin uses the OpenCode v2 plugin system and stores
+> the API key in OpenCode's credential store.
 
 | Tool | Replaces built-in | Description |
 |------|-------------------|-------------|
 | `websearch` | ✅ `websearch` | Premium web search via Kagi (registered as the default websearch provider) |
 | `webfetch` | ✅ `webfetch` | Fetch and extract markdown from a URL |
-| `kagi_extract` | — | Explicit extract markdown content from 1–10 URLs |
+| `kagi_extract` | — | Extract markdown content from 1–10 URLs in one call (prefer this over repeated `webfetch` calls) |
 
 ## Setup
-
-### OpenCode v2 (recommended)
 
 Install the plugin through OpenCode:
 
@@ -52,28 +48,9 @@ Plugin options can disable individual pieces:
 }
 ```
 
-### OpenCode v1 (legacy)
-
-```bash
-npx opencode-tool-kagi
-```
-
-Or locally:
-
-```bash
-npm run setup
-```
-
-The interactive wizard guides you through:
-
-- **Install scope** — per-project (`.opencode/tools/`) or global (`~/.config/opencode/tools/`)
-- **Tools selection** — all tools with built-in overrides, or just `kagi_extract`
-- **API key** — optional; set it now or later via `KAGI_API_KEY` env var
-
 ### Requirements
 
-- OpenCode v2 (plugin) or v1 (copied tools)
-- Node.js >= 18 for the v1 wizard
+- OpenCode v2
 - A [Kagi API key](https://kagi.com/api/keys)
 
 ### API key resolution
@@ -82,10 +59,8 @@ The key is looked up in this order:
 
 1. The Kagi credential stored by opencode (`/connect`, or `KAGI_API_KEY` exposed as an integration connection)
 2. `KAGI_API_KEY` environment variable
-3. `~/.config/opencode/kagi-api-key` (global, written by the v1 installer)
-4. `.opencode/kagi-api-key` (per-project)
 
-On OpenCode v2 the plugin registers a `kagi` integration, so `/connect` manages the key through opencode's auth system. The file/env fallbacks remain for the v1 tools.
+The plugin registers a `kagi` integration, so `/connect` manages the key through opencode's auth system.
 
 ## Usage
 
@@ -94,7 +69,7 @@ Once installed, use the tools directly in opencode:
 ```
 > websearch "latest ai research papers 2026"
 > webfetch https://example.com/article
-> kagi_extract urls: ["https://example.com/article"]
+> kagi_extract urls: ["https://example.com/article", "https://example.com/other"]
 ```
 
 ## Tools
@@ -115,10 +90,15 @@ Replaces the built-in `webfetch` with Kagi Extract.
 
 ### `kagi_extract`
 
-Explicit extract tool — clean markdown from URLs.
+Extract clean markdown from URLs — batch multiple links into one call.
+
+The tool descriptions tell the model to pass every URL it needs in a single `kagi_extract`
+call (up to 10) rather than issuing one `webfetch` per link, so multi-link research uses
+one Kagi Extract request instead of many.
 
 | Arg | Type | Required | Description |
 |-----|------|----------|-------------|
 | `urls` | `string[]` | ✅ | 1–10 URLs to extract |
 | `timeout` | `number` | — | Time budget in seconds for the bulk extraction (clamped by Kagi) |
 | `max_chars` | `number` | — | Max characters per URL (truncated locally) |
+| `format` | `enum` | — | Output format: `markdown` (default) or `json` for the raw structured Kagi response |

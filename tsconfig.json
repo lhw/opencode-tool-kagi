@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": [".opencode/**/*.ts", "src/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

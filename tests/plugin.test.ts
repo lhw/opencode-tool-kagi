@@ -86,6 +86,38 @@ describe("v2 plugin", () => {
     assert.equal(tools.length, 0)
   })
 
+  it("requests JSON from the Extract API and can return it verbatim", async () => {
+    const { ctx, tools } = mockContext()
+    await plugin.setup(ctx as never)
+    const extract = tools.find((t) => t.name === "kagi_extract") as unknown as {
+      execute: (input: unknown) => Promise<{ content: string }>
+    }
+
+    const originalFetch = globalThis.fetch
+    const originalKey = process.env.KAGI_API_KEY
+    process.env.KAGI_API_KEY = "test-key"
+    let requestBody: Record<string, unknown> | undefined
+    globalThis.fetch = (async (_url: string, init: RequestInit) => {
+      requestBody = JSON.parse(init.body as string)
+      return new Response(
+        JSON.stringify({ data: [{ url: "https://a.com", markdown: "# A" }], meta: { trace: "t1" } }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      )
+    }) as typeof fetch
+    try {
+      const out = await extract.execute({ urls: ["https://a.com"], format: "json" })
+      assert.equal(requestBody?.format, "json")
+      assert.deepEqual(JSON.parse(out.content), {
+        data: [{ url: "https://a.com", markdown: "# A" }],
+        meta: { trace: "t1" },
+      })
+    } finally {
+      globalThis.fetch = originalFetch
+      if (originalKey === undefined) delete process.env.KAGI_API_KEY
+      else process.env.KAGI_API_KEY = originalKey
+    }
+  })
+
   it("uses the credential stored in opencode's auth system", async () => {
     const { ctx, providers } = mockContext({}, {
       active: async () => ({ type: "credential", id: "cred-1", label: "Kagi" }),

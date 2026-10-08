@@ -5,7 +5,7 @@ import {
   formatExtract,
   type KagiSearchResponse,
   type ExtractPage,
-} from "../.opencode/tools/_kagi"
+} from "../src/kagi"
 
 describe("formatSearchResults", () => {
   it("handles empty response", () => {

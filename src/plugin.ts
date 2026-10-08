@@ -4,7 +4,7 @@ import {
   extractPages,
   formatExtract,
   type KagiResult,
-} from "../.opencode/tools/_kagi"
+} from "./kagi"
 
 function publishedAt(time?: string): { published?: number } {
   if (!time) return {}
@@ -29,7 +29,9 @@ const EXTRACT_INPUT = {
       items: { type: "string" },
       minItems: 1,
       maxItems: 10,
-      description: "Array of 1–10 HTTP(S) URLs to extract content from",
+      description:
+        "HTTP(S) URLs to extract, 1–10 per call. Batch every page you need into one call — " +
+        "do not fetch them one at a time.",
     },
     timeout: {
       type: "number",
@@ -38,6 +40,13 @@ const EXTRACT_INPUT = {
     max_chars: {
       type: "number",
       description: "Maximum characters to return per URL (default: no limit)",
+    },
+    format: {
+      type: "string",
+      enum: ["markdown", "json"],
+      description:
+        "Output format. `markdown` (default) renders the extracted pages as readable markdown; " +
+        "`json` returns the raw structured Kagi response (per-URL markdown, errors, and meta).",
     },
   },
   required: ["urls"],
@@ -62,7 +71,6 @@ const WEBFETCH_INPUT = {
 export default Plugin.define({
   id: "opencode-tool-kagi",
   async setup(ctx) {
-    const cwd = ctx.location.directory
     const options = ctx.options as { websearch?: boolean; webfetch?: boolean; extract?: boolean }
 
     await ctx.integration.transform((editor) => {
@@ -92,7 +100,7 @@ export default Plugin.define({
           id: "kagi",
           name: "Kagi",
           async execute({ query }) {
-            const result = await searchKagi({ query, limit: 10, cwd, key: await resolveKey() })
+            const result = await searchKagi({ query, limit: 10, key: await resolveKey() })
             if (!result.ok) throw new Error(result.error)
             const d = result.data.data
             const results = d?.search?.length ? d.search : [...(d?.direct_answer ?? []), ...(d?.news ?? [])]
@@ -108,8 +116,9 @@ export default Plugin.define({
         editor.add({
           name: "webfetch",
           description:
-            "Fetch and extract clean markdown content from a URL using Kagi's Extract API. " +
-            "Replaces the built-in webfetch — strips ads, navigation, and cruft, returns proper markdown.",
+            "Fetch and extract clean markdown content from a single URL using Kagi's Extract API. " +
+            "Replaces the built-in webfetch — strips ads, navigation, and cruft, returns proper markdown. " +
+            "For two or more URLs, call `kagi_extract` once with the full list (up to 10) instead of calling webfetch repeatedly.",
           input: WEBFETCH_INPUT,
           async execute(input) {
             const { url, timeout, max_chars } = input as {
@@ -117,7 +126,7 @@ export default Plugin.define({
               timeout?: number
               max_chars?: number
             }
-            const result = await extractPages([url], { timeout, cwd, key: await resolveKey() })
+            const result = await extractPages([url], { timeout, key: await resolveKey() })
             if (!result.ok) return { content: result.error }
             const pages = result.data.data ?? []
             const trace = result.data.meta?.trace
@@ -133,17 +142,23 @@ export default Plugin.define({
         editor.add({
           name: "kagi_extract",
           description:
-            "Extract clean markdown content from 1–10 URLs using Kagi's Extract API. " +
-            "Returns rendered text content stripped of ads and navigation — ideal for reading articles, docs, and web pages.",
+            "Extract clean markdown content from multiple URLs in one call using Kagi's Extract API. " +
+            "ALWAYS batch the URLs you need into a single call — pass up to 10 per call rather than fetching " +
+            "them one by one with webfetch. Returns rendered text content stripped of ads and navigation — " +
+            "ideal for reading articles, docs, and web pages. Set `format` to `json` for the raw structured response.",
           input: EXTRACT_INPUT,
           async execute(input) {
-            const { urls, timeout, max_chars } = input as {
+            const { urls, timeout, max_chars, format } = input as {
               urls: string[]
               timeout?: number
               max_chars?: number
+              format?: "markdown" | "json"
             }
-            const result = await extractPages(urls, { timeout, cwd, key: await resolveKey() })
+            const result = await extractPages(urls, { timeout, key: await resolveKey() })
             if (!result.ok) return { content: result.error }
+            if (format === "json") {
+              return { content: JSON.stringify(result.data, null, 2) }
+            }
             const pages = result.data.data ?? []
             const trace = result.data.meta?.trace
             const output = formatExtract(pages, max_chars)

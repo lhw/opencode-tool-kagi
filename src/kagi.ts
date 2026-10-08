@@ -1,40 +1,13 @@
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
-
 export const API_BASE = "https://kagi.com/api/v1"
 
-function keyFileFallbacks(cwd: string): string[] {
-  const home = process.env.HOME ?? process.env.USERPROFILE ?? ""
-  return [
-    join(home, ".config", "opencode", "kagi-api-key"),
-    join(cwd, ".opencode", "kagi-api-key"),
-  ]
+export function apiKey(): string {
+  return process.env.KAGI_API_KEY ?? ""
 }
 
-function readKeyFile(path: string): string {
-  try {
-    return readFileSync(path, "utf-8").trim()
-  } catch {
-    return ""
-  }
-}
-
-export function apiKey(cwd: string = process.cwd()): string {
-  const env = process.env.KAGI_API_KEY
-  if (env) return env
-  for (const p of keyFileFallbacks(cwd)) {
-    const val = readKeyFile(p)
-    if (val) return val
-  }
-  return ""
-}
-
-export function missingKeyError(cwd: string = process.cwd()): string {
-  const home = process.env.HOME ?? process.env.USERPROFILE ?? "~"
+export function missingKeyError(): string {
   return (
-    "**Kagi API key not set.** Connect Kagi with `/connect` in opencode, set the `KAGI_API_KEY` environment variable, or create a `kagi-api-key` file (mode 0600) in one of:\n" +
-    `- \`${join(home, ".config", "opencode", "kagi-api-key")}\` (global)\n` +
-    `- \`${join(cwd, ".opencode", "kagi-api-key")}\` (project)`
+    "**Kagi API key not set.** Connect Kagi with `/connect` in opencode, " +
+    "or set the `KAGI_API_KEY` environment variable."
   )
 }
 
@@ -70,13 +43,10 @@ export type SearchParams = {
   safe_search?: boolean
   /** Explicit API key, e.g. resolved from opencode's credential store. */
   key?: string
-  /** Directory used to resolve a project-local `kagi-api-key`. */
-  cwd?: string
 }
 
 type RequestOptions = {
   key?: string
-  cwd?: string
 }
 
 async function requestKagi<T>(
@@ -84,9 +54,9 @@ async function requestKagi<T>(
   body: Record<string, unknown>,
   opts: RequestOptions = {},
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
-  const key = opts.key || apiKey(opts.cwd)
+  const key = opts.key || apiKey()
   if (!key) {
-    return { ok: false, error: missingKeyError(opts.cwd) }
+    return { ok: false, error: missingKeyError() }
   }
 
   let res: Response
@@ -113,8 +83,8 @@ async function requestKagi<T>(
       return {
         ok: false,
         error:
-          `**Invalid or expired API key (HTTP ${res.status}).** Get a key at https://kagi.com/api/keys and set ` +
-          `\`KAGI_API_KEY\` or a \`kagi-api-key\` file.${detail}`,
+          `**Invalid or expired API key (HTTP ${res.status}).** Get a key at https://kagi.com/api/keys ` +
+          `and connect it with \`/connect\`, or set \`KAGI_API_KEY\`.${detail}`,
       }
     }
 
@@ -148,7 +118,7 @@ export async function searchKagi(
   if (params.workflow) body.workflow = params.workflow
   if (params.lens_id) body.lens_id = params.lens_id
   if (params.safe_search !== undefined) body.safe_search = params.safe_search
-  return requestKagi<KagiSearchResponse>("/search", body, { key: params.key, cwd: params.cwd })
+  return requestKagi<KagiSearchResponse>("/search", body, { key: params.key })
 }
 
 export function formatSearchResults(resp: KagiSearchResponse, query: string): string {
@@ -233,19 +203,26 @@ export interface ExtractResult {
 export type ExtractOptions = {
   /** Time budget in seconds for the bulk extraction operation (clamped by Kagi). */
   timeout?: number
+  /**
+   * Response format requested from the Kagi Extract API.
+   * The API defaults to structured `json`; `markdown` (experimental) returns a
+   * markdown-serialized body. Defaults to `json`.
+   */
+  format?: "json" | "markdown"
   /** Explicit API key, e.g. resolved from opencode's credential store. */
   key?: string
-  /** Directory used to resolve a project-local `kagi-api-key`. */
-  cwd?: string
 }
 
 export async function extractPages(
   urls: string[],
   opts: ExtractOptions = {},
 ): Promise<{ ok: true; data: ExtractResult } | { ok: false; error: string }> {
-  const body: Record<string, unknown> = { pages: urls.map((u) => ({ url: u })) }
+  const body: Record<string, unknown> = {
+    pages: urls.map((u) => ({ url: u })),
+    format: opts.format ?? "json",
+  }
   if (opts.timeout !== undefined) body.timeout = opts.timeout
-  return requestKagi<ExtractResult>("/extract", body, { key: opts.key, cwd: opts.cwd })
+  return requestKagi<ExtractResult>("/extract", body, { key: opts.key })
 }
 
 export function formatExtract(pages: ExtractPage[], maxChars?: number): string {
