@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/lhw/opencode-tool-kagi/compare/v3.0.0...v3.1.0) (2026-10-22)
+
+
+### Features
+
+* let OpenCode choose the websearch provider ([be35ba5](https://github.com/lhw/opencode-tool-kagi/commit/be35ba54f7e407bbfaeb42f390c5cdbdbf7aee0a))
+
 ## [3.0.0](https://github.com/lhw/opencode-tool-kagi/compare/v2.0.2...v3.0.0) (2026-10-08)
 
 
