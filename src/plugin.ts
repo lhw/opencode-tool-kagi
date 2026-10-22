@@ -107,7 +107,6 @@ export default Plugin.define({
             return toWebResults(results)
           },
         })
-        editor.default.set("kagi")
       })
     }
 
