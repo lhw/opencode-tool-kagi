@@ -57,12 +57,12 @@ function mockContext(
 }
 
 describe("v2 plugin", () => {
-  it("registers Kagi as the default websearch provider", async () => {
+  it("registers Kagi as a websearch provider without forcing the selection", async () => {
     const { ctx, providers, state } = mockContext()
     await plugin.setup(ctx as never)
     assert.equal(providers.length, 1)
     assert.equal(providers[0].id, "kagi")
-    assert.equal(state.default, "kagi")
+    assert.equal(state.default, undefined)
   })
 
   it("registers webfetch and kagi_extract tools", async () => {
